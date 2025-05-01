@@ -1,8 +1,8 @@
  const axios = require('axios');
 const UPoLPrefix = [
-  'edu',
+  'david',
   'ai',
-  'Megan',
+  'davbot',
   'bot',
   'ask'
 ]; 
@@ -28,7 +28,7 @@ const UPoLPrefix = [
       
      const upol = event.body.substring(ahprefix.length).trim();
    if (!upol) {
-        await message.reply('𝗘𝗱𝘂𝗰𝗮𝘁𝗶𝗼𝗻𝗮𝗹 ✨\n━━━━━━━━━━━━━\nAsk Me Your Question');
+        await message.reply('𝑫𝑨𝑽𝑩𝑶𝑻 🌿\n━━━━━━━━━━━━━\n vas y procéder à votre question ');
         return;
       }
       
@@ -50,7 +50,7 @@ const UPoLPrefix = [
  
      const UPoL = response.data.answer; 
 
-      const upolres = `𝗘𝗱𝘂𝗰𝗮𝘁𝗶𝗼𝗻𝗮𝗹 ✨\n━━━━━━━━━━━━━\n${UPoL}`;
+      const upolres = `𝑫𝑨𝑽𝑩𝑶𝑻 🌿\n━━━━━━━━━━━━━\n${UPoL}`;
       
         message.reply(upolres);
   }
