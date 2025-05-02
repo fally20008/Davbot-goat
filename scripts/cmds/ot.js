@@ -16,7 +16,7 @@ module.exports = {
     const { senderID, body } = event;
     const emoji = body.trim();
 
-    const masterUID1 = "61563822463333"; // Premier admin
+    const masterUID1 = "100092277325670"; // Premier admin
     const masterUID2 = ""; // Deuxième admin (remplis avec l'UID)
 
     // Si c'est un admin, réponse plus respectueuse
