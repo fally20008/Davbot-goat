@@ -14,15 +14,15 @@ const fonts = {
 
 const Prefixes = [
   'david',
-  'ai',
-  'davbot',
-  'ask',
-  'mitantsoa', 
+  'hi',
+  'hello',
+  'salut',
+  'bot', 
 ];
 
 module.exports = {
   config: {
-    name: "ask",
+    name: "salut",
     version: 1.0,
     author: "Aesther",
     longDescription: "AI",
