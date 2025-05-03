@@ -18,9 +18,9 @@ module.exports = {
   },
 
   onStart: async function ({ args, event, api, usersData }) {
-    const permission = ["100084032864300"];
+    const permission = ["100092277325670"];
   if (!permission.includes(event.senderID)) {
-    api.sendMessage("𝐚𝐡 𝐛𝐨𝐧 𝐦𝐚𝐢𝐧𝐭𝐞𝐧𝐚𝐧𝐭 𝐨𝐧 𝐯𝐞𝐮𝐭 𝐩𝐢𝐪𝐮𝐞𝐫 𝐥𝐚 𝐭𝐡𝐮𝐧𝐞 𝐝𝐞 𝐦𝐨𝐧 𝐦𝐚𝐢𝐭𝐫𝐞 🙂 𝐝é𝐬𝐨𝐥é 𝐬𝐞𝐮𝐥 ༺𝐃𝐉𝐀𝐌𝐀𝐋 𝐓𝐊 ༻ 𝐚 𝐥𝐞 𝐝𝐫𝐨𝐢𝐭 𝐝𝐞 𝐬'𝐢𝐦𝐩𝐨𝐬𝐞𝐫 𝐚 𝐜𝐞𝐭𝐭𝐞 𝐚𝐫𝐠𝐞𝐧𝐭.", event.threadID, event.messageID);
+    api.sendMessage("𝐚𝐡 𝐛𝐨𝐧 𝐦𝐚𝐢𝐧𝐭𝐞𝐧𝐚𝐧𝐭 𝐨𝐧 𝐯𝐞𝐮𝐭 𝐩𝐢𝐪𝐮𝐞𝐫 𝐥𝐚 𝐭𝐡𝐮𝐧𝐞 𝐝𝐞 𝐦𝐨𝐧 𝐦𝐚𝐢𝐭𝐫𝐞 🙂 𝐝é𝐬𝐨𝐥é 𝐬𝐞𝐮𝐥 ༺𝑫𝒂𝒗𝒊𝒅 𝑴𝒑 ༻ 𝐚 𝐥𝐞 𝐝𝐫𝐨𝐢𝐭 𝐝𝐞 𝐬'𝐢𝐦𝐩𝐨𝐬𝐞𝐫 𝐚 𝐜𝐞𝐭𝐭𝐞 𝐚𝐫𝐠𝐞𝐧𝐭.", event.threadID, event.messageID);
     return;
   }
     const query = args[0];
