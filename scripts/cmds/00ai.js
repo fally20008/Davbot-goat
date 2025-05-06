@@ -13,11 +13,11 @@ const fonts = {
 };
 
 const Prefixes = [
-  'david',
+  '',
   'hi',
   'hello',
   'salut',
-  'bot', 
+  '', 
 ];
 
 module.exports = {
