@@ -1,92 +1,112 @@
-const os = require('os');
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
+const os = require("os");
+const fs = require("fs-extra");
+
+const startTime = new Date(); // Moved outside onStart
 
 module.exports = {
- config: {
- name: "uptime",
- aliases: ["upt","stat"],
- version: "1.0",
- author: "JARiF@Cock",
- role: 0,
- category: "owner",
- guide: {
- en: "Use {p}info"
- }
- },
- onStart: async function ({ message }) {
+  config: {
+    name: "uptime",
+    aliases: ["up"],
+    author: "ArYAN",
+    countDown: 0,
+    role: 0,
+    category: "system",
+    longDescription: {
+      en: "Get System Information",
+    },
+  },
+  
+  onStart: async function ({ api, event, args, threadsData, usersData }) {
+    try {
+      const uptimeInSeconds = (new Date() - startTime) / 1000;
 
- const uptime = process.uptime();
- const formattedUptime = formatMilliseconds(uptime * 1000);
+      const seconds = uptimeInSeconds;
+      const days = Math.floor(seconds / (3600 * 24));
+      const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secondsLeft = Math.floor(seconds % 60);
+      const uptimeFormatted = `${days}d ${hours}h ${minutes}m ${secondsLeft}s`;
 
- const totalMemory = os.totalmem();
- const freeMemory = os.freemem();
- const usedMemory = totalMemory - freeMemory;
+      const loadAverage = os.loadavg();
+      const cpuUsage =
+        os
+          .cpus()
+          .map((cpu) => cpu.times.user)
+          .reduce((acc, curr) => acc + curr) / os.cpus().length;
 
- const diskUsage = await getDiskUsage();
+      const totalMemoryGB = os.totalmem() / 1024 ** 3;
+      const freeMemoryGB = os.freemem() / 1024 ** 3;
+      const usedMemoryGB = totalMemoryGB - freeMemoryGB;
 
- const systemInfo = {
- os: `${os.type()} ${os.release()}`,
- arch: os.arch(),
- cpu: `${os.cpus()[0].model} (${os.cpus().length} cores)`,
- loadAvg: os.loadavg()[0], // 1-minute load average
- botUptime: formattedUptime,
- systemUptime: formatUptime(os.uptime()),
- processMemory: prettyBytes(process.memoryUsage().rss)
- };
+      const allUsers = await usersData.getAll();
+      const allThreads = await threadsData.getAll();
+      const currentDate = new Date();
+      const options = { year: "numeric", month: "numeric", day: "numeric" };
+      const date = currentDate.toLocaleDateString("en-US", options);
+      const time = currentDate.toLocaleTimeString("en-US", {
+        timeZone: "Asia/Kolkata",
+        hour12: true,
+      });
 
- const response = `★ 𝐒𝐲𝐬𝐭𝐞𝐦 𝐎𝐯𝐞𝐫𝐯𝐢𝐞𝐰 ★\n`
- + '-------------------------------------\n'
- + '⚙ 𝐒𝐲𝐬𝐭𝐞𝐦 𝐈𝐧𝐟𝐨𝐫𝐦𝐚𝐭𝐢𝐨𝐧:\n'
- + ` 𝐎𝐒: ${systemInfo.os}\n`
- + ` 𝐀𝐫𝐜𝐡: ${systemInfo.arch}\n`
- + ` 𝐂𝐏𝐔: ${systemInfo.cpu}\n`
- + ` 𝐋𝐨𝐚𝐝 𝐀𝐯𝐠: ${systemInfo.loadAvg}%\n`
- + '-------------------------------------\n'
- + `💾 𝐌𝐞𝐦𝐨𝐫𝐲 𝐈𝐧𝐟𝐨𝐫𝐦𝐚𝐭𝐢𝐨𝐧:\n`
- + ` 𝐌𝐞𝐦𝐨𝐫𝐲 𝐔𝐬𝐚𝐠𝐞: \n${prettyBytes(usedMemory)} / Total ${prettyBytes(totalMemory)}\n`
- + ` 𝐑𝐀𝐌 𝐔𝐬𝐚𝐠𝐞: \n${prettyBytes(os.totalmem() - os.freemem())} / Total ${prettyBytes(totalMemory)}\n`
- + '-------------------------------------\n'
- + `💿 𝐃𝐢𝐬𝐤 𝐒𝐩𝐚𝐜𝐞 𝐈𝐧𝐟𝐨𝐫𝐦𝐚𝐭𝐢𝐨𝐧:\n`
- + ` 𝐃𝐢𝐬𝐤 𝐒𝐩𝐚𝐜𝐞 𝐔𝐬𝐚𝐠𝐞: \n${prettyBytes(diskUsage.used)} / Total ${prettyBytes(diskUsage.total)}\n`
- + '-------------------------------------\n'
- + `🤖 𝐁𝐨𝐭 𝐔𝐩𝐭𝐢𝐦𝐞: ${systemInfo.botUptime}\n`
- + `⚙ 𝐒𝐞𝐫𝐯𝐞𝐫 𝐔𝐩𝐭𝐢𝐦𝐞: ${systemInfo.systemUptime}\n`
- + `📊 𝐏𝐫𝐨𝐜𝐞𝐬𝐬 𝐌𝐞𝐦𝐨𝐫𝐲 𝐔𝐬𝐚𝐠𝐞: \n${systemInfo.processMemory}\n`
- + '-------------------------------------';
+      const timeStart = Date.now();
+      await api.sendMessage({
+        body: "🔎| checking........",
+      }, event.threadID);
 
- message.reply(response);
- }
+      const ping = Date.now() - timeStart;
+
+      let pingStatus = "⛔| 𝖡𝖺𝖽 𝖲𝗒𝗌𝗍𝖾𝗆";
+      if (ping < 1000) {
+        pingStatus = "✅| 𝖲𝗆𝗈𝗈𝗍𝗁 𝖲𝗒𝗌𝗍𝖾𝗆";
+      }
+      const systemInfo = `
+╭────────────⟡
+│ 𝗨𝗣𝗧𝗜𝗠𝗘 𝗜𝗡𝗙𝗢
+├───────────────⟡
+│ ⏰ 𝗥𝗨𝗡𝗧𝗜𝗠𝗘
+│  ${uptimeFormatted}
+├───────────────⟡
+│ 👑 𝗦𝗬𝗦𝗧𝗘𝗠 𝗜𝗡𝗙𝗢
+│𝙾𝚂: ${os.type()} ${os.arch()}
+│𝙻𝙰𝙽𝙶 𝚅𝙴𝚁: ${process.version}
+│𝙲𝙿𝚄 𝙼𝙾𝙳𝙴𝙻: ${os.cpus()[0].model}
+│𝚂𝚃𝙾𝚁𝙰𝙶𝙴: ${usedMemoryGB.toFixed(2)} GB / ${totalMemoryGB.toFixed(2)} GB
+│𝙲𝙿𝚄 𝚄𝚂𝙰𝙶𝙴: ${cpuUsage.toFixed(1)}%
+│𝚁𝙰𝙼 𝚄𝚂𝙶𝙴: ${process.memoryUsage().heapUsed / 1024 / 1024} MB;
+├───────────────⟡
+│ ✅ 𝗢𝗧𝗛𝗘𝗥 𝗜𝗡𝗙𝗢
+│𝙳𝙰𝚃𝙴: ${date}
+│𝚃𝙸𝙼𝙴: ${time}
+│𝚄𝚂𝙴𝚁𝚂: ${allUsers.length}
+│𝚃𝙷𝚁𝙴𝙰𝙳𝚂: ${allThreads.length}
+│𝙿𝙸𝙽𝙶: ${ping}𝚖𝚜
+│𝚂𝚃𝙰𝚃𝚄𝚂: ${pingStatus}
+╰───────────────⟡
+`;
+
+      api.sendMessage(
+        {
+          body: systemInfo,
+        },
+        event.threadID,
+        (err, messageInfo) => {
+          if (err) {
+            console.error("Error sending message with attachment:", err);
+          } else {
+            console.log(
+              "Message with attachment sent successfully:",
+              messageInfo,
+            );
+          }
+        },
+      );
+    } catch (error) {
+      console.error("Error retrieving system information:", error);
+      api.sendMessage(
+        "Unable to retrieve system information.",
+        event.threadID,
+        event.messageID,
+      );
+    }
+  },
 };
-
-async function getDiskUsage() {
- const { stdout } = await exec('df -k /');
- const [_, total, used] = stdout.split('\n')[1].split(/\s+/).filter(Boolean);
- return { total: parseInt(total) * 1024, used: parseInt(used) * 1024 };
-}
-
-function formatUptime(seconds) {
- const days = Math.floor(seconds / 86400);
- const hours = Math.floor((seconds % 86400) / 3600);
- const minutes = Math.floor((seconds % 3600) / 60);
-
- return `${days}d ${hours}h ${minutes}m`;
-}
-
-function formatMilliseconds(ms) {
- const seconds = Math.floor(ms / 1000);
- const minutes = Math.floor(seconds / 60);
- const hours = Math.floor(minutes / 60);
-
- return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
-}
-
-function prettyBytes(bytes) {
- const units = ['B', 'KB', 'MB', 'GB', 'TB'];
- let i = 0;
- while (bytes >= 1024 && i < units.length - 1) {
- bytes /= 1024;
- i++;
- }
- return `${bytes.toFixed(2)} ${units[i]}`;
-}
