@@ -35,7 +35,7 @@ function loadChangelog() {
 
 module.exports = {
 	config: {
-		name: "vip2",
+		name: "vip",
 		version: "1.0", // Updated version to 1.0
 		author: "𝖙𝖍𝖊 𝖛𝖔𝖎𝖉 𝖐𝖚𝖓",
 		role: 2,
